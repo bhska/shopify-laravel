@@ -1,0 +1,3599 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Laravel Shopify API",
+        "description": "RESTful API for managing Shopify products and variants with GraphQL integration",
+        "contact": {
+            "name": "API Support",
+            "email": "dev@example.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "Development API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user and generate API token",
+                "operationId": "a7997e7c1e3bfed64d4e56de82415931",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "api@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "5|j6psFE3uyUTWeJMyqo5G1GM6GVR7aRq5RnlNCd4P47030c18"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "API User"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "api@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The provided credentials are incorrect."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user and revoke token",
+                "operationId": "f6b8957b4c0b25636613a9f0512a8ba9",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user details",
+                "operationId": "37d33f0281f67d31d05b4c45eea0143b",
+                "responses": {
+                    "200": {
+                        "description": "User details retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 4
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "API User"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "api@example.com"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh API token (create new token and revoke old one)",
+                "operationId": "c42c3cd7fd7fe0dbd5bcc42962059e90",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token refreshed successfully"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "5|j6psFE3uyUTWeJMyqo5G1GM6GVR7aRq5RnlNCd4P47030c18"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Basic health check",
+                "description": "Quick health check to verify API is running",
+                "operationId": "3ca826f7cac74bc5938370a4c01acee3",
+                "responses": {
+                    "200": {
+                        "description": "API is healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/health/detailed": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Detailed health check",
+                "description": "Comprehensive health check including database, Shopify, and storage",
+                "operationId": "1a463b53cad67937a0fbef889cd18689",
+                "responses": {
+                    "200": {
+                        "description": "All systems are healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Overall system status",
+                                            "type": "string",
+                                            "enum": [
+                                                "healthy",
+                                                "unhealthy"
+                                            ],
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "description": "Health check timestamp",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "services": {
+                                            "properties": {
+                                                "database": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "healthy",
+                                                        "unhealthy"
+                                                    ],
+                                                    "example": "healthy"
+                                                },
+                                                "shopify": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "healthy",
+                                                        "unhealthy"
+                                                    ],
+                                                    "example": "healthy"
+                                                },
+                                                "storage": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "healthy",
+                                                        "unhealthy"
+                                                    ],
+                                                    "example": "healthy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "version": {
+                                            "description": "API version",
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "environment": {
+                                            "description": "Application environment",
+                                            "type": "string",
+                                            "example": "local"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "One or more services are unhealthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "unhealthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "services": {
+                                            "properties": {
+                                                "database": {
+                                                    "type": "string",
+                                                    "example": "unhealthy"
+                                                },
+                                                "shopify": {
+                                                    "type": "string",
+                                                    "example": "healthy"
+                                                },
+                                                "storage": {
+                                                    "type": "string",
+                                                    "example": "healthy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/health/database": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Database health check",
+                "description": "Check database connectivity and basic operations",
+                "operationId": "ec5c6f7e25b39b0b8f065894fe50a5c5",
+                "responses": {
+                    "200": {
+                        "description": "Database is healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "connection": {
+                                            "type": "string",
+                                            "example": "mysql"
+                                        },
+                                        "database": {
+                                            "type": "string",
+                                            "example": "shopify_laravel"
+                                        },
+                                        "response_time_ms": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Database is unhealthy"
+                    }
+                }
+            }
+        },
+        "/api/v1/health/shopify": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Shopify API health check",
+                "description": "Check Shopify API connectivity and authentication",
+                "operationId": "989da16dc9893a2b73d7c49b435bf51f",
+                "responses": {
+                    "200": {
+                        "description": "Shopify API is accessible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "store_url": {
+                                            "type": "string",
+                                            "example": "https://mystore.myshopify.com"
+                                        },
+                                        "api_version": {
+                                            "type": "string",
+                                            "example": "2025-10"
+                                        },
+                                        "response_time_ms": {
+                                            "type": "integer",
+                                            "example": 250
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Shopify API is not accessible"
+                    }
+                }
+            }
+        },
+        "/api/v1/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get paginated list of products",
+                "operationId": "1ce27f90dd8c39cea9520bf45d58c7c2",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search products by title",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Product"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product",
+                "description": "Create a new product and sync it to Shopify. All operations are wrapped in a database transaction.",
+                "operationId": "acaa0d3fdc74fd4b534e70fc016cf7f1",
+                "parameters": [
+                    {
+                        "name": "X-Requested-With",
+                        "in": "header",
+                        "description": "Header to identify AJAX requests",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "XMLHttpRequest"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Product title (required)",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Premium T-Shirt"
+                                    },
+                                    "body_html": {
+                                        "description": "Product description in HTML",
+                                        "type": "string",
+                                        "example": "<p>High quality cotton t-shirt with premium print</p>",
+                                        "nullable": true
+                                    },
+                                    "vendor": {
+                                        "description": "Product vendor",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "BrandName",
+                                        "nullable": true
+                                    },
+                                    "product_type": {
+                                        "description": "Product type/category",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Clothing",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "description": "Product status (required)",
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ],
+                                        "example": "active"
+                                    },
+                                    "variants": {
+                                        "description": "Product variants array",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "option1": {
+                                                    "description": "First variant option",
+                                                    "type": "string",
+                                                    "example": "Medium",
+                                                    "nullable": true
+                                                },
+                                                "option2": {
+                                                    "description": "Second variant option",
+                                                    "type": "string",
+                                                    "example": "Red",
+                                                    "nullable": true
+                                                },
+                                                "price": {
+                                                    "description": "Variant price (required with variants)",
+                                                    "type": "number",
+                                                    "format": "decimal",
+                                                    "minimum": 0,
+                                                    "example": 29.99
+                                                },
+                                                "sku": {
+                                                    "description": "Stock keeping unit",
+                                                    "type": "string",
+                                                    "example": "TSHIRT-M-RED",
+                                                    "nullable": true
+                                                },
+                                                "inventory_quantity": {
+                                                    "description": "Available inventory quantity",
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        {
+                                            "properties": {
+                                                "variants": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Variant"
+                                                    }
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProductImage"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid data provided",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "title": [
+                                                    "The title field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify sync failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Shopify API Error: Product creation failed"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products/{product}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get a specific product",
+                "description": "Retrieve a single product by ID with its variants and images",
+                "operationId": "9d6564b9647b6b46ca1d3eb86c51643e",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include related resources",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "variants",
+                                "images",
+                                "variants,images"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        {
+                                            "properties": {
+                                                "variants": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Variant"
+                                                    }
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProductImage"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Update a product",
+                "description": "Update an existing product and sync changes to Shopify",
+                "operationId": "10db88cc185f628118bfa9a84d1401bb",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Updated product title",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Premium T-Shirt v2",
+                                        "nullable": true
+                                    },
+                                    "body_html": {
+                                        "description": "Updated product description in HTML",
+                                        "type": "string",
+                                        "example": "<p>Updated product description</p>",
+                                        "nullable": true
+                                    },
+                                    "vendor": {
+                                        "description": "Updated product vendor",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "UpdatedBrandName",
+                                        "nullable": true
+                                    },
+                                    "product_type": {
+                                        "description": "Updated product type/category",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "UpdatedClothing",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "description": "Updated product status",
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "draft",
+                                            "archived"
+                                        ],
+                                        "example": "draft",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Product"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid data provided"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify sync failed"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete a product",
+                "description": "Soft delete a product locally and remove it from Shopify if it exists",
+                "operationId": "dc780252f855e97451083ce643a83174",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "Force delete from Shopify even if local soft delete fails",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Product deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify deletion failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to delete product from Shopify"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products/bulk": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Bulk create products",
+                "description": "Create multiple products in a single request",
+                "operationId": "9fc44bcdc9be047e70c5fdd8f4b464ae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "products": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/StoreProductRequest"
+                                        },
+                                        "maxItems": 50,
+                                        "minItems": 1
+                                    },
+                                    "skip_errors": {
+                                        "description": "Continue processing even if some products fail",
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "sync_to_shopify": {
+                                        "description": "Sync products to Shopify",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Bulk operation started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "operation_id": {
+                                            "description": "Unique operation identifier",
+                                            "type": "string",
+                                            "example": "bulk_op_123456"
+                                        },
+                                        "status": {
+                                            "description": "Operation status",
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ],
+                                            "example": "processing"
+                                        },
+                                        "total_items": {
+                                            "description": "Total items to process",
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "processed_items": {
+                                            "description": "Items processed so far",
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "failed_items": {
+                                            "description": "Items that failed processing",
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "started_at": {
+                                            "description": "Operation start time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "estimated_completion": {
+                                            "description": "Estimated completion time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T16:00:00Z"
+                                        },
+                                        "progress_percentage": {
+                                            "description": "Progress percentage",
+                                            "type": "number",
+                                            "format": "decimal",
+                                            "example": 45
+                                        },
+                                        "errors": {
+                                            "description": "Error messages",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Product 456 validation failed"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Bulk delete products",
+                "description": "Delete multiple products in a single request",
+                "operationId": "a92c4b7d4b28b3d71d0b622a498fc566",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "product_ids": {
+                                        "description": "Array of product IDs to delete",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "maxItems": 100,
+                                        "minItems": 1
+                                    },
+                                    "force": {
+                                        "description": "Force delete (hard delete)",
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "delete_from_shopify": {
+                                        "description": "Delete from Shopify as well",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Bulk deletion started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "operation_id": {
+                                            "description": "Unique operation identifier",
+                                            "type": "string",
+                                            "example": "bulk_op_123456"
+                                        },
+                                        "status": {
+                                            "description": "Operation status",
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ],
+                                            "example": "processing"
+                                        },
+                                        "total_items": {
+                                            "description": "Total items to process",
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "processed_items": {
+                                            "description": "Items processed so far",
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "failed_items": {
+                                            "description": "Items that failed processing",
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "started_at": {
+                                            "description": "Operation start time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "estimated_completion": {
+                                            "description": "Estimated completion time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T16:00:00Z"
+                                        },
+                                        "progress_percentage": {
+                                            "description": "Progress percentage",
+                                            "type": "number",
+                                            "format": "decimal",
+                                            "example": 45
+                                        },
+                                        "errors": {
+                                            "description": "Error messages",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Product 456 validation failed"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Bulk update products",
+                "description": "Update multiple products in a single request",
+                "operationId": "f4c12da06a96ba4a8094b49c280850cf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "updates": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Product ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Updated Title",
+                                                    "nullable": true
+                                                },
+                                                "body_html": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "vendor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "product_type": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "draft",
+                                                        "archived"
+                                                    ],
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "maxItems": 50,
+                                        "minItems": 1
+                                    },
+                                    "skip_errors": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "sync_to_shopify": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Bulk update started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "operation_id": {
+                                            "description": "Unique operation identifier",
+                                            "type": "string",
+                                            "example": "bulk_op_123456"
+                                        },
+                                        "status": {
+                                            "description": "Operation status",
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ],
+                                            "example": "processing"
+                                        },
+                                        "total_items": {
+                                            "description": "Total items to process",
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "processed_items": {
+                                            "description": "Items processed so far",
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "failed_items": {
+                                            "description": "Items that failed processing",
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "started_at": {
+                                            "description": "Operation start time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "estimated_completion": {
+                                            "description": "Estimated completion time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T16:00:00Z"
+                                        },
+                                        "progress_percentage": {
+                                            "description": "Progress percentage",
+                                            "type": "number",
+                                            "format": "decimal",
+                                            "example": 45
+                                        },
+                                        "errors": {
+                                            "description": "Error messages",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Product 456 validation failed"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/products/bulk/status/{operation_id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get bulk operation status",
+                "description": "Check the status of a bulk operation",
+                "operationId": "60c3977f6148e4a7694aad44be92e1cb",
+                "parameters": [
+                    {
+                        "name": "operation_id",
+                        "in": "path",
+                        "description": "Bulk operation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operation status retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "operation_id": {
+                                            "description": "Unique operation identifier",
+                                            "type": "string",
+                                            "example": "bulk_op_123456"
+                                        },
+                                        "status": {
+                                            "description": "Operation status",
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ],
+                                            "example": "processing"
+                                        },
+                                        "total_items": {
+                                            "description": "Total items to process",
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "processed_items": {
+                                            "description": "Items processed so far",
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "failed_items": {
+                                            "description": "Items that failed processing",
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "started_at": {
+                                            "description": "Operation start time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "estimated_completion": {
+                                            "description": "Estimated completion time",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T16:00:00Z"
+                                        },
+                                        "progress_percentage": {
+                                            "description": "Progress percentage",
+                                            "type": "number",
+                                            "format": "decimal",
+                                            "example": 45
+                                        },
+                                        "errors": {
+                                            "description": "Error messages",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Product 456 validation failed"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Operation not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/search/products": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Advanced product search",
+                "description": "Search products with multiple filters and sorting options",
+                "operationId": "7610860f1e4fb6b72f7f5a97d5815444",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query for title, description, vendor, SKU",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by product status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "draft",
+                                "archived"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "vendor",
+                        "in": "query",
+                        "description": "Filter by vendor",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "product_type",
+                        "in": "query",
+                        "description": "Filter by product type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Minimum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Maximum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    },
+                    {
+                        "name": "has_shopify_id",
+                        "in": "query",
+                        "description": "Filter by Shopify sync status",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "title",
+                                "price",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include related resources",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "variants",
+                                "images",
+                                "variants,images"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ProductWithRelations"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total_pages": {
+                                                    "type": "integer"
+                                                },
+                                                "filters_applied": {
+                                                    "type": "object"
+                                                },
+                                                "search_time_ms": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search/suggestions": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Get search suggestions",
+                "description": "Get auto-complete suggestions for product search",
+                "operationId": "99976af1affaad8a524e8ce0fa0ddd7c",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Partial search query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Type of suggestions",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all",
+                            "enum": [
+                                "titles",
+                                "vendors",
+                                "product_types",
+                                "all"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of suggestions",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search suggestions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "type": "string",
+                                            "example": "t-shir"
+                                        },
+                                        "suggestions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "title"
+                                                    },
+                                                    "value": {
+                                                        "type": "string",
+                                                        "example": "T-Shirt"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "example": 25
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search/filters": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Get available filters",
+                "description": "Get available filter options and their counts",
+                "operationId": "b91ff1a2fff51aa8ef8492a02cb04f18",
+                "parameters": [
+                    {
+                        "name": "filter_type",
+                        "in": "query",
+                        "description": "Type of filters to return",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all",
+                            "enum": [
+                                "status",
+                                "vendor",
+                                "product_type",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available filters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "filters": {
+                                            "type": "object",
+                                            "example": {
+                                                "status": {
+                                                    "active": 150,
+                                                    "draft": 25,
+                                                    "archived": 10
+                                                },
+                                                "vendors": {
+                                                    "BrandA": 50,
+                                                    "BrandB": 30,
+                                                    "BrandC": 20
+                                                },
+                                                "product_types": {
+                                                    "Clothing": 80,
+                                                    "Accessories": 40,
+                                                    "Electronics": 25
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search/variants": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Advanced variant search",
+                "description": "Search variants with multiple filters",
+                "operationId": "6bb549d2deeceb6a5816719fae03760b",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query for SKU, options",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Filter by product ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Minimum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Maximum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    },
+                    {
+                        "name": "has_inventory",
+                        "in": "query",
+                        "description": "Filter by inventory availability",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Variant search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Variant"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/import": {
+            "post": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Import products from Shopify",
+                "description": "Import products from Shopify to local database with pagination support",
+                "operationId": "b47fdf99fab727c63fef8f466d041157",
+                "parameters": [
+                    {
+                        "name": "first",
+                        "in": "query",
+                        "description": "Number of products to import",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 50,
+                            "maximum": 250
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Pagination cursor for fetching next page",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "update_existing",
+                        "in": "query",
+                        "description": "Whether to update existing products",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Products imported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "imported": {
+                                            "type": "integer",
+                                            "example": 25
+                                        },
+                                        "updated": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 35
+                                        },
+                                        "hasNextPage": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "endCursor": {
+                                            "type": "string",
+                                            "example": "eyJpZCI6IjEyMzQ1Njc4OTAifQ=="
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Import completed successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify API error"
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/export/{product}": {
+            "post": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Export specific product to Shopify",
+                "description": "Export a local product to Shopify (creates new or updates existing)",
+                "operationId": "178968bf4360a8ef88da9a220b3e506a",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID to export",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "force_create",
+                        "in": "query",
+                        "description": "Force create new product even if shopify_product_id exists",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product exported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product exported successfully"
+                                        },
+                                        "shopify_product_id": {
+                                            "type": "integer",
+                                            "example": 987654321
+                                        },
+                                        "shopify_gid": {
+                                            "type": "string",
+                                            "example": "gid://shopify/Product/987654321"
+                                        },
+                                        "synced_variants": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "422": {
+                        "description": "Validation error - Product missing required data"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify API error"
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/export/bulk": {
+            "post": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Export multiple products to Shopify",
+                "description": "Bulk export products to Shopify (operates in background)",
+                "operationId": "51a9c7b12100304b1c8eb0df03d9fb18",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "product_ids": {
+                                        "description": "Array of product IDs to export",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ]
+                                    },
+                                    "update_existing": {
+                                        "description": "Update existing products in Shopify",
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "skip_failed": {
+                                        "description": "Continue processing if some products fail",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Bulk export started successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BulkOperationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Invalid product IDs"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/sync/status": {
+            "get": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Get sync status overview",
+                "description": "Get comprehensive sync status between local database and Shopify",
+                "operationId": "ab11c3a7cc856327e068461f06b9ee04",
+                "responses": {
+                    "200": {
+                        "description": "Sync status retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Sync status",
+                                            "type": "string",
+                                            "enum": [
+                                                "synced",
+                                                "pending",
+                                                "error"
+                                            ],
+                                            "example": "synced"
+                                        },
+                                        "last_sync_at": {
+                                            "description": "Last sync timestamp",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-20T15:45:00Z"
+                                        },
+                                        "total_products": {
+                                            "description": "Total products in system",
+                                            "type": "integer",
+                                            "example": 150
+                                        },
+                                        "synced_products": {
+                                            "description": "Products synced to Shopify",
+                                            "type": "integer",
+                                            "example": 145
+                                        },
+                                        "pending_products": {
+                                            "description": "Products pending sync",
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "sync_errors": {
+                                            "description": "Sync error messages",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Product 123 sync failed"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/sync/validate": {
+            "post": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Validate Shopify credentials",
+                "description": "Test Shopify API credentials and connection",
+                "operationId": "60b241944a32e8e1f01a0103b9084193",
+                "responses": {
+                    "200": {
+                        "description": "Credentials are valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "valid": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "shop_name": {
+                                            "type": "string",
+                                            "example": "My Awesome Store"
+                                        },
+                                        "shop_domain": {
+                                            "type": "string",
+                                            "example": "mystore.myshopify.com"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Shopify credentials are valid"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "valid": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Invalid access token or store domain"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shopify/sync/conflicts": {
+            "get": {
+                "tags": [
+                    "Shopify"
+                ],
+                "summary": "Get sync conflicts",
+                "description": "Identify products with sync conflicts between local and Shopify data",
+                "operationId": "b0278ed9432963782ca12953c22db8b5",
+                "parameters": [
+                    {
+                        "name": "resolve",
+                        "in": "query",
+                        "description": "Type of conflicts to return",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all",
+                            "enum": [
+                                "all",
+                                "local_newer",
+                                "shopify_newer"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conflicts retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "conflicts": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "conflict_type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "local_newer",
+                                                            "shopify_newer",
+                                                            "variant_mismatch"
+                                                        ]
+                                                    },
+                                                    "local_updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "shopify_updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total_conflicts": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/variants": {
+            "get": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Get paginated list of variants",
+                "description": "Retrieve variants with optional filtering and search",
+                "operationId": "093380c8a2fbba8accfd507c05a8d6fa",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Filter by product ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search variants by SKU or title",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "description": "Minimum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "description": "Maximum price filter",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Variant"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/variants/{variant}": {
+            "get": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Get a specific variant",
+                "description": "Retrieve a single variant by ID",
+                "operationId": "e44308d5e2c064aeca84ecd09a5a3e6c",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Variant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Variant"
+                                        },
+                                        {
+                                            "properties": {
+                                                "product": {
+                                                    "$ref": "#/components/schemas/Product"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Variant not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Update a variant",
+                "description": "Update an existing variant and sync changes to Shopify",
+                "operationId": "1a15844a98f18d127a3b961afe989e21",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Variant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option1": {
+                                        "description": "First variant option",
+                                        "type": "string",
+                                        "example": "Large",
+                                        "nullable": true
+                                    },
+                                    "option2": {
+                                        "description": "Second variant option",
+                                        "type": "string",
+                                        "example": "Blue",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "description": "Variant price",
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "minimum": 0,
+                                        "example": 35.99
+                                    },
+                                    "sku": {
+                                        "description": "Stock keeping unit",
+                                        "type": "string",
+                                        "example": "TSHIRT-L-BLU",
+                                        "nullable": true
+                                    },
+                                    "inventory_quantity": {
+                                        "description": "Available inventory quantity",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 75
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Variant updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Variant"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Variant not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify sync failed"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Delete a variant",
+                "description": "Delete a variant locally and from Shopify if it exists",
+                "operationId": "33cec85ab519fb659dde35d77047b7e9",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Variant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Variant deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Variant not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify deletion failed"
+                    }
+                }
+            }
+        },
+        "/api/v1/products/{product}/variants": {
+            "get": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Get variants for a product",
+                "description": "Retrieve all variants for a specific product",
+                "operationId": "6cbbd9ecb3d6b653318df6e9c0617965",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Variant"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Create a new variant",
+                "description": "Create a new variant for a product and sync to Shopify",
+                "operationId": "489c1d777f477e636cdafd6a7e4d23ba",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option1": {
+                                        "description": "First variant option",
+                                        "type": "string",
+                                        "example": "Medium",
+                                        "nullable": true
+                                    },
+                                    "option2": {
+                                        "description": "Second variant option",
+                                        "type": "string",
+                                        "example": "Red",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "description": "Variant price (required)",
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "minimum": 0,
+                                        "example": 29.99
+                                    },
+                                    "sku": {
+                                        "description": "Stock keeping unit",
+                                        "type": "string",
+                                        "example": "TSHIRT-M-RED",
+                                        "nullable": true
+                                    },
+                                    "inventory_quantity": {
+                                        "description": "Available inventory quantity",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 50
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Variant created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Variant"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Shopify sync failed"
+                    }
+                }
+            }
+        },
+        "/api/v1/variants/{variant}/inventory": {
+            "patch": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Update variant inventory",
+                "description": "Quick inventory update for a variant",
+                "operationId": "85627e1b2ec18ad53c5bb2214c4bbc61",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Variant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "inventory_quantity": {
+                                        "description": "New inventory quantity",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 100
+                                    },
+                                    "operation": {
+                                        "description": "Inventory operation type",
+                                        "type": "string",
+                                        "enum": [
+                                            "set",
+                                            "add",
+                                            "subtract"
+                                        ],
+                                        "example": "set"
+                                    },
+                                    "sync_to_shopify": {
+                                        "description": "Sync inventory to Shopify",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inventory updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Inventory updated successfully"
+                                        },
+                                        "old_quantity": {
+                                            "type": "integer",
+                                            "example": 50
+                                        },
+                                        "new_quantity": {
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "change": {
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Variant not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Product": {
+                "title": "Product",
+                "description": "Product model with basic information",
+                "properties": {
+                    "id": {
+                        "description": "Local product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "shopify_product_id": {
+                        "description": "Shopify product ID",
+                        "type": "integer",
+                        "example": 987654321,
+                        "nullable": true
+                    },
+                    "title": {
+                        "description": "Product title",
+                        "type": "string",
+                        "example": "Premium T-Shirt"
+                    },
+                    "body_html": {
+                        "description": "Product description in HTML",
+                        "type": "string",
+                        "example": "<p>High quality cotton t-shirt</p>",
+                        "nullable": true
+                    },
+                    "vendor": {
+                        "description": "Product vendor",
+                        "type": "string",
+                        "example": "BrandName",
+                        "nullable": true
+                    },
+                    "product_type": {
+                        "description": "Product type/category",
+                        "type": "string",
+                        "example": "Clothing",
+                        "nullable": true
+                    },
+                    "status": {
+                        "description": "Product status",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "draft",
+                            "archived"
+                        ],
+                        "example": "active"
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Variant": {
+                "title": "Product Variant",
+                "description": "Product variant with pricing and inventory",
+                "properties": {
+                    "id": {
+                        "description": "Local variant ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_id": {
+                        "description": "Parent product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "shopify_variant_id": {
+                        "description": "Shopify variant ID",
+                        "type": "integer",
+                        "example": 987654322,
+                        "nullable": true
+                    },
+                    "option1": {
+                        "description": "First variant option",
+                        "type": "string",
+                        "example": "Medium",
+                        "nullable": true
+                    },
+                    "option2": {
+                        "description": "Second variant option",
+                        "type": "string",
+                        "example": "Red",
+                        "nullable": true
+                    },
+                    "price": {
+                        "description": "Variant price",
+                        "type": "number",
+                        "format": "decimal",
+                        "example": 29.99
+                    },
+                    "sku": {
+                        "description": "Stock keeping unit",
+                        "type": "string",
+                        "example": "TSHIRT-M-RED",
+                        "nullable": true
+                    },
+                    "inventory_quantity": {
+                        "description": "Available inventory quantity",
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductImage": {
+                "title": "Product Image",
+                "description": "Product image with Shopify integration",
+                "properties": {
+                    "id": {
+                        "description": "Local image ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_id": {
+                        "description": "Parent product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "shopify_image_id": {
+                        "description": "Shopify image ID",
+                        "type": "integer",
+                        "example": 987654323,
+                        "nullable": true
+                    },
+                    "path": {
+                        "description": "Local file path",
+                        "type": "string",
+                        "example": "products/tshirt-medium-red.jpg"
+                    },
+                    "url": {
+                        "description": "Full image URL",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/storage/products/tshirt-medium-red.jpg"
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreProductRequest": {
+                "title": "Store Product Request",
+                "description": "Request schema for creating a new product",
+                "properties": {
+                    "title": {
+                        "description": "Product title (required)",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Premium T-Shirt"
+                    },
+                    "body_html": {
+                        "description": "Product description in HTML",
+                        "type": "string",
+                        "example": "<p>High quality cotton t-shirt with premium print</p>",
+                        "nullable": true
+                    },
+                    "vendor": {
+                        "description": "Product vendor",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "BrandName",
+                        "nullable": true
+                    },
+                    "product_type": {
+                        "description": "Product type/category",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Clothing",
+                        "nullable": true
+                    },
+                    "status": {
+                        "description": "Product status (required)",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "draft",
+                            "archived"
+                        ],
+                        "example": "active"
+                    },
+                    "variants": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "option1": {
+                                    "type": "string",
+                                    "example": "Medium",
+                                    "nullable": true
+                                },
+                                "option2": {
+                                    "type": "string",
+                                    "example": "Red",
+                                    "nullable": true
+                                },
+                                "price": {
+                                    "type": "number",
+                                    "format": "decimal",
+                                    "minimum": 0,
+                                    "example": 29.99
+                                },
+                                "sku": {
+                                    "type": "string",
+                                    "example": "TSHIRT-M-RED",
+                                    "nullable": true
+                                },
+                                "inventory_quantity": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "example": 50
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateProductRequest": {
+                "title": "Update Product Request",
+                "description": "Request schema for updating an existing product",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Premium T-Shirt v2",
+                        "nullable": true
+                    },
+                    "body_html": {
+                        "type": "string",
+                        "example": "<p>Updated product description</p>",
+                        "nullable": true
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "UpdatedBrandName",
+                        "nullable": true
+                    },
+                    "product_type": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "UpdatedClothing",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "draft",
+                            "archived"
+                        ],
+                        "example": "draft",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "BulkOperationResponse": {
+                "title": "Bulk Operation Response",
+                "description": "Response schema for bulk operations",
+                "properties": {
+                    "operation_id": {
+                        "description": "Unique operation identifier",
+                        "type": "string",
+                        "example": "bulk_op_123456"
+                    },
+                    "status": {
+                        "description": "Operation status",
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "processing",
+                            "completed",
+                            "failed"
+                        ],
+                        "example": "processing"
+                    },
+                    "total_items": {
+                        "description": "Total items to process",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "processed_items": {
+                        "description": "Items processed so far",
+                        "type": "integer",
+                        "example": 45
+                    },
+                    "failed_items": {
+                        "description": "Items that failed processing",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "started_at": {
+                        "description": "Operation start time",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    },
+                    "estimated_completion": {
+                        "description": "Estimated completion time",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T16:00:00Z"
+                    },
+                    "progress_percentage": {
+                        "description": "Progress percentage",
+                        "type": "number",
+                        "format": "decimal",
+                        "example": 45
+                    },
+                    "errors": {
+                        "description": "Error messages",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "Product 456 validation failed"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "SyncStatusResponse": {
+                "title": "Sync Status Response",
+                "description": "Response schema for Shopify sync status",
+                "properties": {
+                    "shopify_connected": {
+                        "description": "Whether Shopify API is connected",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "total_products": {
+                        "description": "Total products in database",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "synced_products": {
+                        "description": "Products synced with Shopify",
+                        "type": "integer",
+                        "example": 95
+                    },
+                    "total_variants": {
+                        "description": "Total variants in database",
+                        "type": "integer",
+                        "example": 250
+                    },
+                    "synced_variants": {
+                        "description": "Variants synced with Shopify",
+                        "type": "integer",
+                        "example": 240
+                    },
+                    "last_sync": {
+                        "description": "Last successful sync timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    },
+                    "pending_syncs": {
+                        "description": "Products pending sync",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "sync_conflicts": {
+                        "description": "Sync conflict messages",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "Product 123 has conflicting data"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "HealthCheckResponse": {
+                "title": "Health Check Response",
+                "description": "Response schema for health check endpoints",
+                "properties": {
+                    "status": {
+                        "description": "Overall system status",
+                        "type": "string",
+                        "enum": [
+                            "healthy",
+                            "unhealthy",
+                            "degraded"
+                        ],
+                        "example": "healthy"
+                    },
+                    "timestamp": {
+                        "description": "Health check timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T15:45:00Z"
+                    },
+                    "version": {
+                        "description": "API version",
+                        "type": "string",
+                        "example": "1.0.0"
+                    },
+                    "uptime": {
+                        "description": "System uptime",
+                        "type": "string",
+                        "example": "5 days, 12:34:56"
+                    },
+                    "database": {
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "connected"
+                            },
+                            "connections": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "latency_ms": {
+                                "type": "number",
+                                "example": 2.5
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "shopify": {
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "connected"
+                            },
+                            "api_calls_remaining": {
+                                "type": "integer",
+                                "example": 1800
+                            },
+                            "api_calls_limit": {
+                                "type": "integer",
+                                "example": 2000
+                            },
+                            "latency_ms": {
+                                "type": "number",
+                                "example": 150
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "storage": {
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "available"
+                            },
+                            "free_space_mb": {
+                                "type": "integer",
+                                "example": 10240
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductWithRelations": {
+                "title": "Product with Relations",
+                "description": "Product model with variants and images loaded",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                        "properties": {
+                            "variants": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Variant"
+                                }
+                            },
+                            "images": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ProductImage"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "SearchSuggestion": {
+                "title": "Search Suggestion",
+                "description": "Search suggestion result",
+                "properties": {
+                    "id": {
+                        "description": "Product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Product title",
+                        "type": "string",
+                        "example": "Premium T-Shirt"
+                    },
+                    "sku": {
+                        "description": "First matching SKU",
+                        "type": "string",
+                        "example": "TSHIRT-M-RED",
+                        "nullable": true
+                    },
+                    "vendor": {
+                        "description": "Product vendor",
+                        "type": "string",
+                        "example": "BrandName",
+                        "nullable": true
+                    },
+                    "relevance_score": {
+                        "description": "Search relevance score",
+                        "type": "number",
+                        "format": "decimal",
+                        "example": 0.95
+                    }
+                },
+                "type": "object"
+            },
+            "FilterOption": {
+                "title": "Filter Option",
+                "description": "Available filter option with count",
+                "properties": {
+                    "value": {
+                        "description": "Filter value",
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "label": {
+                        "description": "Human-readable label",
+                        "type": "string",
+                        "example": "Active"
+                    },
+                    "count": {
+                        "description": "Number of items matching this filter",
+                        "type": "integer",
+                        "example": 45
+                    }
+                },
+                "type": "object"
+            },
+            "SearchFiltersResponse": {
+                "title": "Search Filters Response",
+                "description": "Available search filters with counts",
+                "properties": {
+                    "status": {
+                        "description": "Status filters",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FilterOption"
+                        }
+                    },
+                    "vendor": {
+                        "description": "Vendor filters",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FilterOption"
+                        }
+                    },
+                    "product_type": {
+                        "description": "Product type filters",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FilterOption"
+                        }
+                    },
+                    "price_ranges": {
+                        "description": "Price range filters",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FilterOption"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Laravel Sanctum Bearer Token authentication. Use the token returned from /api/v1/auth/login endpoint in the format: Bearer {your_token}",
+                "bearerFormat": "Token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "User authentication and token management endpoints"
+        },
+        {
+            "name": "Health",
+            "description": "Health check and system status endpoints"
+        },
+        {
+            "name": "Search",
+            "description": "Advanced search and filtering endpoints"
+        },
+        {
+            "name": "Shopify",
+            "description": "Shopify-specific operations and synchronization"
+        },
+        {
+            "name": "Products",
+            "description": "Product management endpoints with Shopify integration"
+        },
+        {
+            "name": "Variants",
+            "description": "Product variant management endpoints"
+        }
+    ]
+}
