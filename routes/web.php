@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,4 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::post('products/{product}/upload-image', [ProductController::class, 'uploadImage'])->name('web.products.upload-image');
     Route::post('products/sync-from-shopify', [ProductController::class, 'syncFromShopify'])->name('products.sync-from-shopify');
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
+
+    // Product Image Management Routes
+    Route::post('products/{product}/images', [ProductImageManagementController::class, 'store'])->name('products.images.store');
+    Route::delete('products/{product}/images/{image}', [ProductImageManagementController::class, 'destroy'])->name('products.images.destroy');
 });

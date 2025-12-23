@@ -107,6 +107,26 @@ class ProductController extends Controller
                         }
                     }
 
+                    // Upload images to Shopify after product is synced
+                    if ($request->hasFile('images')) {
+                        foreach ($request->file('images') as $imageFile) {
+                            if ($imageFile && $imageFile->isValid()) {
+                                try {
+                                    $shopifyImage = $this->shopifyService->uploadProductImage($product, $imageFile);
+                                    $imageId = $this->extractIdFromGid($shopifyImage['id']);
+
+                                    $product->images()->create([
+                                        'shopify_image_id' => $imageId,
+                                        'path' => $shopifyImage['url'],
+                                    ]);
+                                } catch (\Exception $e) {
+                                    // Log error but continue with other images
+                                    logger()->error('Failed to upload image to Shopify: '.$e->getMessage());
+                                }
+                            }
+                        }
+                    }
+
                 } catch (\Exception $e) {
                     // In a real app, we might want to catch this and redirect with error
                     // but for now let's bubble up or just flash

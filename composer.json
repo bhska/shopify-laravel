@@ -11,7 +11,9 @@
         "dedoc/scramble": "^0.13.8",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "league/commonmark": "^2.8",
+        "tonysm/rich-text-laravel": "^3.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -353,19 +353,37 @@ class ShopifyService
     }
 
     /**
-     * Upload product image to Shopify.
+     * Upload product image to Shopify using staged uploads.
      *
-     * @return array Shopify image data
+     * @return array Shopify image data with id and url
      */
     public function uploadProductImage(Product $product, UploadedFile $image): array
     {
+        // Step 1: Create staged upload target
+        $stagedUpload = $this->createStagedUpload($image);
+
+        // Step 2: Upload file to staged target
+        $this->uploadToStagedTarget($stagedUpload, $image);
+
+        // Step 3: Create product media using the staged upload URL
+        return $this->createProductMedia($product, $stagedUpload['resourceUrl'], $image->getClientOriginalName());
+    }
+
+    /**
+     * Create a staged upload target for the image.
+     */
+    protected function createStagedUpload(UploadedFile $image): array
+    {
         $query = '
-            mutation productImageCreate($input: ProductImageInput!) {
-                productImageCreate(input: $input) {
-                    image {
-                        id
+            mutation stagedUploadsCreate($input: [StagedUploadInput!]!) {
+                stagedUploadsCreate(input: $input) {
+                    stagedTargets {
+                        resourceUrl
                         url
-                        altText
+                        parameters {
+                            name
+                            value
+                        }
                     }
                     userErrors {
                         field
@@ -375,24 +393,167 @@ class ShopifyService
             }
         ';
 
-        $base64 = base64_encode($image->get());
-
         $variables = [
             'input' => [
-                'productId' => $this->createGid('Product', $product->shopify_product_id),
-                'attachment' => $base64,
-                'filename' => $image->getClientOriginalName(),
+                [
+                    'filename' => $image->getClientOriginalName(),
+                    'mimeType' => $image->getMimeType(),
+                    'fileSize' => (string) $image->getSize(),
+                    'resource' => 'IMAGE',
+                    'httpMethod' => 'POST',
+                ],
             ],
         ];
 
         $response = $this->query($query, $variables);
 
-        if (isset($response['data']['productImageCreate']['userErrors']) && ! empty($response['data']['productImageCreate']['userErrors'])) {
-            $errors = $response['data']['productImageCreate']['userErrors'];
+        // Check for GraphQL errors
+        if (isset($response['errors']) && ! empty($response['errors'])) {
+            $errorMessages = array_map(fn ($e) => $e['message'] ?? 'Unknown error', $response['errors']);
+            throw new \Exception('Shopify GraphQL Error: '.implode(', ', $errorMessages));
+        }
+
+        // Check for user errors
+        if (isset($response['data']['stagedUploadsCreate']['userErrors']) && ! empty($response['data']['stagedUploadsCreate']['userErrors'])) {
+            $errors = $response['data']['stagedUploadsCreate']['userErrors'];
             throw new \Exception('Shopify API Error: '.implode(', ', array_column($errors, 'message')));
         }
 
-        return $response['data']['productImageCreate']['image'];
+        $stagedTargets = $response['data']['stagedUploadsCreate']['stagedTargets'] ?? [];
+        if (empty($stagedTargets)) {
+            throw new \Exception('Failed to create staged upload: No staged targets returned');
+        }
+
+        return $stagedTargets[0];
+    }
+
+    /**
+     * Upload file to the staged target URL.
+     */
+    protected function uploadToStagedTarget(array $stagedUpload, UploadedFile $image): void
+    {
+        $url = $stagedUpload['url'];
+        $parameters = $stagedUpload['parameters'];
+
+        // Build multipart form data
+        $multipart = [];
+        foreach ($parameters as $param) {
+            $multipart[] = [
+                'name' => $param['name'],
+                'contents' => $param['value'],
+            ];
+        }
+
+        // Add the file
+        $multipart[] = [
+            'name' => 'file',
+            'contents' => fopen($image->getRealPath(), 'r'),
+            'filename' => $image->getClientOriginalName(),
+        ];
+
+        $response = Http::asMultipart()->post($url, $multipart);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to upload file to staged target: '.$response->body());
+        }
+    }
+
+    /**
+     * Create product media from staged upload URL.
+     */
+    protected function createProductMedia(Product $product, string $resourceUrl, string $filename): array
+    {
+        $query = '
+            mutation productCreateMedia($productId: ID!, $media: [CreateMediaInput!]!) {
+                productCreateMedia(productId: $productId, media: $media) {
+                    media {
+                        ... on MediaImage {
+                            id
+                            image {
+                                url
+                                altText
+                            }
+                        }
+                    }
+                    mediaUserErrors {
+                        field
+                        message
+                    }
+                    product {
+                        id
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'productId' => $this->createGid('Product', $product->shopify_product_id),
+            'media' => [
+                [
+                    'originalSource' => $resourceUrl,
+                    'mediaContentType' => 'IMAGE',
+                    'alt' => pathinfo($filename, PATHINFO_FILENAME),
+                ],
+            ],
+        ];
+
+        $response = $this->query($query, $variables);
+
+        // Check for GraphQL errors
+        if (isset($response['errors']) && ! empty($response['errors'])) {
+            $errorMessages = array_map(fn ($e) => $e['message'] ?? 'Unknown error', $response['errors']);
+            throw new \Exception('Shopify GraphQL Error: '.implode(', ', $errorMessages));
+        }
+
+        // Check for user errors
+        if (isset($response['data']['productCreateMedia']['mediaUserErrors']) && ! empty($response['data']['productCreateMedia']['mediaUserErrors'])) {
+            $errors = $response['data']['productCreateMedia']['mediaUserErrors'];
+            throw new \Exception('Shopify API Error: '.implode(', ', array_column($errors, 'message')));
+        }
+
+        $media = $response['data']['productCreateMedia']['media'] ?? [];
+        if (empty($media)) {
+            throw new \Exception('Failed to create product media: No media returned');
+        }
+
+        $mediaImage = $media[0];
+
+        return [
+            'id' => $mediaImage['id'],
+            'url' => $mediaImage['image']['url'] ?? $resourceUrl,
+            'altText' => $mediaImage['image']['altText'] ?? null,
+        ];
+    }
+
+    /**
+     * Delete product image from Shopify.
+     */
+    public function deleteProductImage(Product $product, int $shopifyImageId): void
+    {
+        $query = '
+            mutation productImageDelete($input: ProductImageDeleteInput!) {
+                productImageDelete(input: $input) {
+                    deletedImageId
+                    userErrors {
+                        field
+                        message
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'input' => [
+                'id' => $this->createGid('ProductImage', $shopifyImageId),
+            ],
+        ];
+
+        $response = $this->query($query, $variables);
+
+        if (isset($response['data']['productImageDelete']['userErrors']) && ! empty($response['data']['productImageDelete']['userErrors'])) {
+            $errors = $response['data']['productImageDelete']['userErrors'];
+            throw new \Exception('Shopify API Error: '.implode(', ', array_column($errors, 'message')));
+        }
     }
 
     /**

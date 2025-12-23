@@ -13,35 +13,52 @@ class ProductImageController extends Controller
     public function __construct(protected ShopifyService $shopifyService) {}
 
     /**
-     * Handle the incoming request.
+     * Upload product image to Shopify.
      */
-    public function __invoke(Request $request, Product $product): JsonResponse
+    public function store(Request $request, Product $product): JsonResponse
     {
         $request->validate([
-            'image' => ['required', 'image', 'max:10240'], // 10MB limit
+            'image' => ['required', 'image', 'max:10240'],
         ]);
 
-        $file = $request->file('image');
-        $path = $file->store('product_images', 'public');
-
-        $productImage = $product->images()->create([
-            'path' => $path,
-        ]);
-
-        // Sync to Shopify
-        try {
-            $shopifyImage = $this->shopifyService->uploadProductImage($product, $file);
-
-            $productImage->update([
-                'shopify_image_id' => $shopifyImage->id,
-            ]);
-        } catch (\Exception $e) {
-            // Log error but maybe don't fail the request completely if local storage worked?
-            // PRD: "Sync: Send image to Shopify... Store shopify_image_id"
-            // If sync fails, we likely want to inform user.
-            throw $e;
+        if (! $product->shopify_product_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product must be synced to Shopify first before uploading images.',
+            ], 422);
         }
 
-        return response()->json($productImage, 201);
+        $file = $request->file('image');
+
+        try {
+            $shopifyImage = $this->shopifyService->uploadProductImage($product, $file);
+            $imageId = $this->extractIdFromGid($shopifyImage['id']);
+
+            $productImage = $product->images()->create([
+                'shopify_image_id' => $imageId,
+                'path' => $shopifyImage['url'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image uploaded to Shopify successfully!',
+                'data' => $productImage,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to upload image to Shopify: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Extract numeric ID from Shopify GID.
+     */
+    protected function extractIdFromGid(string $gid): int
+    {
+        $parts = explode('/', $gid);
+
+        return (int) end($parts);
     }
 }

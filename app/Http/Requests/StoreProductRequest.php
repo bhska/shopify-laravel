@@ -33,6 +33,20 @@ class StoreProductRequest extends FormRequest
             'variants.*.price' => ['required_with:variants', 'numeric', 'min:0'],
             'variants.*.sku' => ['nullable', 'string'],
             'variants.*.inventory_quantity' => ['nullable', 'integer', 'min:0'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['nullable', 'image', 'mimes:jpeg,png,gif,webp', 'max:10240'],
         ];
+    }
+
+    public function prepareForValidation()
+    {
+        // Filter out null/empty values from images array
+        if ($this->has('images')) {
+            $this->merge([
+                'images' => array_filter($this->file('images') ?: [], function ($file) {
+                    return $file && $file->isValid();
+                }),
+            ]);
+        }
     }
 }

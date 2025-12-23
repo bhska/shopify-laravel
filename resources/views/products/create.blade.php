@@ -50,13 +50,6 @@
                             <input type="text" name="title" id="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" required>
                         </div>
 
-                        <div class="col-span-6">
-                            <label for="body_html" class="block text-sm font-medium text-gray-700">Description (HTML)</label>
-                            <div class="mt-1">
-                                <textarea id="body_html" name="body_html" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"></textarea>
-                            </div>
-                        </div>
-
                         <div class="col-span-6 sm:col-span-3">
                             <label for="vendor" class="block text-sm font-medium text-gray-700">Vendor</label>
                             <input type="text" name="vendor" id="vendor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2">
@@ -74,6 +67,44 @@
                                 <option value="draft">Draft</option>
                                 <option value="archived">Archived</option>
                             </select>
+                        </div>
+
+                        <div class="col-span-6">
+                            <label for="body_html" class="block text-sm font-medium text-gray-700">Description</label>
+                            <x-trix-input
+                                id="body_html"
+                                name="body_html"
+                                class="mt-1"
+                            />
+                            @error('body_html')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Product Images</h3>
+                        <p class="text-sm text-gray-500 mb-4">Upload product images. Images will be synced to Shopify after the product is created.</p>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700">Upload Images</label>
+                            <div class="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="images-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
+                                            <span>Upload files</span>
+                                            <input id="images-upload" name="images[]" type="file" class="sr-only" multiple accept="image/*">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
+                                </div>
+                            </div>
+                            <!-- Preview selected images -->
+                            <div id="images-preview" class="mt-4 grid grid-cols-4 gap-4"></div>
                         </div>
                     </div>
 
@@ -170,6 +201,47 @@
 </div>
 
 <script>
+    // Image preview handling
+    const imagesInput = document.getElementById('images-upload');
+    const imagesPreview = document.getElementById('images-preview');
+    const selectedImages = [];
+
+    imagesInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+
+        files.forEach(file => {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'relative group';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="h-32 w-full object-cover rounded-md border border-gray-200">
+                        <button type="button" onclick="removeImage(this, '${file.name}')" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    `;
+                    preview.dataset.fileName = file.name;
+                    imagesPreview.appendChild(preview);
+                };
+
+                reader.readAsDataURL(file);
+                selectedImages.push(file);
+            }
+        });
+    });
+
+    function removeImage(button, fileName) {
+        button.parentElement.remove();
+        const index = selectedImages.findIndex(img => img.name === fileName);
+        if (index > -1) {
+            selectedImages.splice(index, 1);
+        }
+    }
+
     let variantCount = 1;
     function addVariant() {
         const container = document.getElementById('variants-container');
@@ -222,7 +294,7 @@
         loadingOverlay.classList.remove('hidden');
         loadingOverlay.classList.add('flex');
 
-        // Get form data
+        // Get form data including images
         const formData = new FormData(this);
         const data = {};
         formData.forEach((value, key) => {
@@ -238,16 +310,42 @@
             }
         });
 
+        // Add images to data
+        if (selectedImages.length > 0) {
+            data.images = selectedImages;
+        }
+
+        // Create FormData for file upload
+        const formDataToSend = new FormData();
+        formDataToSend.append('title', data.title || '');
+        formDataToSend.append('body_html', data.body_html || '');
+        formDataToSend.append('vendor', data.vendor || '');
+        formDataToSend.append('product_type', data.product_type || '');
+        formDataToSend.append('status', data.status || 'active');
+        formDataToSend.append('_token', document.querySelector('input[name="_token"]').value);
+
+        // Add variants
+        if (data.variants && Array.isArray(data.variants)) {
+            data.variants.forEach((variant, index) => {
+                for (const key in variant) {
+                    formDataToSend.append(`variants[${index}][${key}]`, variant[key] || '');
+                }
+            });
+        }
+
+        // Add images
+        selectedImages.forEach((image, index) => {
+            formDataToSend.append(`images[${index}]`, image);
+        });
+
         try {
             const response = await fetch('{{ route('products.store') }}', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]').value
                 },
-                body: JSON.stringify(data)
+                body: formDataToSend
             });
 
             const result = await response.json();

@@ -11,6 +11,121 @@
     @else
         <script src="https://cdn.tailwindcss.com"></script>
     @endif
+    <x-rich-text::styles theme="richtextlaravel" data-turbo-track="false" />
+
+    <style>
+        /* Custom Trix Editor Styling - Subtle Borders */
+        trix-editor {
+            border: 1px solid #d1d5db !important; /* gray-300 */
+            border-radius: 0.375rem !important;
+        }
+
+        trix-editor:focus {
+            border-color: #4f46e5 !important; /* indigo-600 */
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+            outline: none !important;
+        }
+
+        trix-toolbar {
+            border: 1px solid #d1d5db !important; /* gray-300 */
+            border-bottom: none !important;
+            border-radius: 0.375rem 0.375rem 0 0 !important;
+        }
+
+        .trix-content {
+            border-radius: 0 0 0.375rem 0.375rem !important;
+        }
+
+        /* Remove black border from toolbar button groups */
+        .trix-button-group {
+            border: none !important;
+        }
+
+        .trix-button {
+            border-color: #e5e7eb !important; /* gray-200 */
+        }
+
+        .trix-button:hover {
+            border-color: #d1d5db !important; /* gray-300 */
+        }
+
+        .trix-button--active {
+            background-color: #e0e7ff !important; /* indigo-100 */
+            border-color: #6366f1 !important; /* indigo-500 */
+        }
+
+        /* Dialog styling */
+        .trix-dialog {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Global Border Styling for Tables and Cards - Subtle Borders */
+        /* Table borders - more subtle */
+        table {
+            border-color: #e5e7eb !important; /* gray-200 instead of default black */
+        }
+
+        thead th {
+            border-color: #e5e7eb !important; /* gray-200 */
+        }
+
+        tbody tr {
+            border-color: #e5e7eb !important; /* gray-200 */
+        }
+
+        td, th {
+            border-color: #e5e7eb !important; /* gray-200 */
+        }
+
+        /* Card borders */
+        .shadow, .shadow-sm, .shadow-md, .shadow-lg {
+            border: 1px solid #e5e7eb !important; /* subtle gray border */
+        }
+
+        sm\\:overflow-hidden, .sm\\:overflow-hidden {
+            border: 1px solid #e5e7eb !important;
+        }
+
+        /* Input borders already use Tailwind's border-gray-300, keeping them consistent */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea,
+        select {
+            border-color: #d1d5db !important; /* gray-300 */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #4f46e5 !important; /* indigo-600 */
+            ring-color: #4f46e5 !important;
+        }
+
+        /* Divider borders */
+        hr, .border-t, .border-b, .border-l, .border-r {
+            border-color: #e5e7eb !important; /* gray-200 */
+        }
+
+        /* Specific overrides for common UI elements */
+        .border {
+            border-color: #e5e7eb !important;
+        }
+
+        .border-gray-200 {
+            border-color: #e5e7eb !important;
+        }
+
+        .border-gray-300 {
+            border-color: #d1d5db !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased">
     <div class="min-h-screen">

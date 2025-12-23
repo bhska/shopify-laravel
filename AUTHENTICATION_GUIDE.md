@@ -13,6 +13,9 @@ Aplikasi ini menggunakan **Laravel Sanctum** untuk autentikasi API. Ada dua tipe
 
 Endpoint berikut dapat diakses **tanpa token**:
 
+### Authentication
+- `POST /api/v1/auth/login` - Login dan mendapatkan token
+
 ### Health Check
 - `GET /api/v1/health` - Health check sederhana
 - `GET /api/v1/health/detailed` - Health check detail
@@ -31,13 +34,18 @@ Endpoint berikut dapat diakses **tanpa token**:
 
 Endpoint berikut **memerlukan API Token**:
 
+### Authentication (Protected)
+- `POST /api/v1/auth/logout` - Logout dan revoke token
+- `GET /api/v1/auth/me` - Info user yang sedang login
+- `POST /api/v1/auth/refresh` - Refresh token
+
 ### Product Management
 - `GET /api/v1/products` - List semua produk
-- `POST /api/v1/products` - Buat produk baru
+- `POST /api/v1/products` - Buat produk baru (auto sync ke Shopify)
 - `GET /api/v1/products/{id}` - Detail produk
-- `PUT/PATCH /api/v1/products/{id}` - Update produk
-- `DELETE /api/v1/products/{id}` - Hapus produk
-- `POST /api/v1/products/{product}/images` - Upload gambar produk
+- `PUT/PATCH /api/v1/products/{id}` - Update produk (auto sync ke Shopify)
+- `DELETE /api/v1/products/{id}` - Hapus produk (auto hapus dari Shopify)
+- `POST /api/v1/products/{id}/images` - Upload gambar ke Shopify
 
 ### Bulk Operations
 - `POST /api/v1/products/bulk` - Bulk create products
@@ -45,9 +53,9 @@ Endpoint berikut **memerlukan API Token**:
 - `DELETE /api/v1/products/bulk` - Bulk delete products
 - `GET /api/v1/products/bulk/status/{operationId}` - Cek status bulk operation
 
-### Shopify Sync (Shopify Related API)
+### Shopify Sync
 - `POST /api/v1/shopify/import` - Import produk dari Shopify
-- `POST /api/v1/shopify/export/{product}` - Export produk ke Shopify
+- `POST /api/v1/shopify/export/{id}` - Export produk ke Shopify
 - `POST /api/v1/shopify/export/bulk` - Bulk export ke Shopify
 - `GET /api/v1/shopify/sync/status` - Status sinkronisasi Shopify
 - `POST /api/v1/shopify/sync/validate` - Validasi kredensial Shopify
@@ -56,11 +64,11 @@ Endpoint berikut **memerlukan API Token**:
 ### Variant Management
 - `GET /api/v1/variants` - List semua variant
 - `GET /api/v1/variants/{id}` - Detail variant
-- `POST /api/v1/products/{product}/variants` - Buat variant baru
+- `POST /api/v1/variants/products/{id}/variants` - Buat variant baru
 - `PUT /api/v1/variants/{id}` - Update variant
 - `DELETE /api/v1/variants/{id}` - Hapus variant
 - `PATCH /api/v1/variants/{id}/inventory` - Update inventory variant
-- `GET /api/v1/products/{product}/variants` - List variant produk
+- `GET /api/v1/products/{id}/variants` - List variant produk
 
 ---
 
@@ -260,6 +268,51 @@ Jika token tidak valid:
 
 ---
 
+---
+
+## 🖼️ Image Upload
+
+### Cara Upload Gambar Produk
+
+Gambar produk di-upload langsung ke Shopify CDN. **Produk harus sudah ter-sync ke Shopify** sebelum bisa upload gambar.
+
+#### Upload via API
+```bash
+curl -X POST http://localhost:8000/api/v1/products/1/images \
+  -H "Authorization: Bearer {token}" \
+  -F "image=@/path/to/image.jpg"
+```
+
+#### Response Sukses
+```json
+{
+  "success": true,
+  "message": "Image uploaded successfully",
+  "data": {
+    "id": 1,
+    "shopify_image_id": 123456789,
+    "path": "https://cdn.shopify.com/s/files/...",
+    "url": "https://cdn.shopify.com/s/files/..."
+  }
+}
+```
+
+#### Error: Product Not Synced
+```json
+{
+  "success": false,
+  "message": "Product must be synced to Shopify first before uploading images."
+}
+```
+
+### Catatan Penting
+- Gambar **tidak disimpan di server lokal**
+- URL gambar dari Shopify CDN disimpan di database
+- Maksimum ukuran file: 10MB
+- Format yang didukung: JPEG, PNG, GIF, WebP
+
+---
+
 ## 📊 Token Management
 
 ### Lihat Semua Token User
@@ -360,9 +413,12 @@ Selalu gunakan HTTPS di production untuk mengenkripsi token
 
 | Endpoint Type | Authentication Required | Token Needed |
 |--------------|------------------------|--------------|
+| Login | ❌ No | No |
 | Health Check | ❌ No | No |
 | Search | ❌ No | No |
+| Auth (logout, me, refresh) | ✅ Yes | Yes |
 | Products CRUD | ✅ Yes | Yes |
+| Image Upload | ✅ Yes | Yes |
 | Bulk Operations | ✅ Yes | Yes |
 | Shopify Sync | ✅ Yes | Yes |
 | Variants CRUD | ✅ Yes | Yes |
@@ -374,6 +430,11 @@ Selalu gunakan HTTPS di production untuk mengenkripsi token
   - `SHOPIFY_ACCESS_TOKEN`
   - `SHOPIFY_DOMAIN`
   - `SHOPIFY_API_VERSION`
+
+### Catatan Image Upload:
+- Gambar di-upload langsung ke Shopify CDN
+- Tidak ada penyimpanan lokal
+- Produk harus sudah ter-sync ke Shopify sebelum upload gambar
 
 ---
 
