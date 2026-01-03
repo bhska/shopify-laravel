@@ -118,4 +118,104 @@ class ProductApiTest extends TestCase
         $response->assertStatus(204);
         $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
+
+    public function test_can_create_product_with_multiple_variants()
+    {
+        $user = User::factory()->create();
+
+        $this->mock(ShopifyService::class, function ($mock) {
+            $mock->shouldReceive('syncProduct')
+                ->once()
+                ->andReturn([
+                    'id' => 'gid://shopify/Product/123456789',
+                    'title' => 'Multi-Variant Product',
+                    'variants' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'id' => 'gid://shopify/ProductVariant/987654321',
+                                    'title' => 'Small / Red',
+                                    'sku' => 'TEST-SKU-001',
+                                    'price' => '10.00',
+                                ],
+                            ],
+                            [
+                                'node' => [
+                                    'id' => 'gid://shopify/ProductVariant/987654322',
+                                    'title' => 'Medium / Red',
+                                    'sku' => 'TEST-SKU-002',
+                                    'price' => '12.00',
+                                ],
+                            ],
+                            [
+                                'node' => [
+                                    'id' => 'gid://shopify/ProductVariant/987654323',
+                                    'title' => 'Large / Blue',
+                                    'sku' => 'TEST-SKU-003',
+                                    'price' => '15.00',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]);
+        });
+
+        $data = [
+            'title' => 'Multi-Variant Product',
+            'status' => 'active',
+            'variants' => [
+                [
+                    'option1' => 'Small',
+                    'option2' => 'Red',
+                    'sku' => 'TEST-SKU-001',
+                    'price' => 10.00,
+                    'inventory_quantity' => 10,
+                ],
+                [
+                    'option1' => 'Medium',
+                    'option2' => 'Red',
+                    'sku' => 'TEST-SKU-002',
+                    'price' => 12.00,
+                    'inventory_quantity' => 15,
+                ],
+                [
+                    'option1' => 'Large',
+                    'option2' => 'Blue',
+                    'sku' => 'TEST-SKU-003',
+                    'price' => 15.00,
+                    'inventory_quantity' => 20,
+                ],
+            ],
+        ];
+
+        $response = $this->actingAs($user)->postJson('/api/v1/products', $data);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('products', [
+            'title' => 'Multi-Variant Product',
+            'shopify_product_id' => 123456789,
+        ]);
+
+        $this->assertDatabaseHas('variants', [
+            'sku' => 'TEST-SKU-001',
+            'option1' => 'Small',
+            'option2' => 'Red',
+            'shopify_variant_id' => 987654321,
+        ]);
+
+        $this->assertDatabaseHas('variants', [
+            'sku' => 'TEST-SKU-002',
+            'option1' => 'Medium',
+            'option2' => 'Red',
+            'shopify_variant_id' => 987654322,
+        ]);
+
+        $this->assertDatabaseHas('variants', [
+            'sku' => 'TEST-SKU-003',
+            'option1' => 'Large',
+            'option2' => 'Blue',
+            'shopify_variant_id' => 987654323,
+        ]);
+    }
 }

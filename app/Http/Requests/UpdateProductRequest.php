@@ -27,6 +27,15 @@ class UpdateProductRequest extends FormRequest
             'vendor' => ['nullable', 'string', 'max:255'],
             'product_type' => ['nullable', 'string', 'max:255'],
             'status' => ['sometimes', 'in:active,draft,archived'],
+            'variants' => ['nullable', 'array'],
+            'variants.*.id' => ['sometimes', 'integer', 'exists:variants,id'],
+            'variants.*.title' => ['nullable', 'string', 'max:255'],
+            'variants.*.option1' => ['nullable', 'string'],
+            'variants.*.option2' => ['nullable', 'string'],
+            'variants.*.option3' => ['nullable', 'string'],
+            'variants.*.price' => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.sku' => ['nullable', 'string', 'max:255'],
+            'variants.*.inventory_quantity' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

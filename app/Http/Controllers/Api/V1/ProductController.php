@@ -385,9 +385,19 @@ class ProductController extends Controller
         return DB::transaction(function () use ($request, $product) {
             $product->update($request->validated());
 
+            if ($request->has('variants')) {
+                foreach ($request->variants as $variantData) {
+                    if (isset($variantData['id'])) {
+                        $product->variants()->where('id', $variantData['id'])->update($variantData);
+                    } else {
+                        $product->variants()->create($variantData);
+                    }
+                }
+            }
+
             $this->shopifyService->syncProduct($product);
 
-            return response()->json($product);
+            return response()->json($product->load('variants'));
         });
     }
 

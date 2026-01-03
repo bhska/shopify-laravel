@@ -30,6 +30,7 @@ class StoreProductRequest extends FormRequest
             'variants' => ['nullable', 'array'],
             'variants.*.option1' => ['nullable', 'string'],
             'variants.*.option2' => ['nullable', 'string'],
+            'variants.*.option3' => ['nullable', 'string'],
             'variants.*.price' => ['required_with:variants', 'numeric', 'min:0'],
             'variants.*.sku' => ['nullable', 'string'],
             'variants.*.inventory_quantity' => ['nullable', 'integer', 'min:0'],

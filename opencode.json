@@ -9,6 +9,15 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "shopify-dev-mcp": {
+            "type": "local",
+            "enabled": true,
+            "command": [
+                "bunx",
+                "-y",
+                "@shopify/dev-mcp@latest"
+            ],
         }
     }
 }
